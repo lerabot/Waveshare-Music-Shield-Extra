@@ -38,29 +38,29 @@
 #include  <avr/pgmspace.h>
 
 #define MaxVol 250
-#define MinVol 100
+#define MinVol 0
 
 
 
 
 /** Playing states definations. */
 volatile typedef enum {
-  PS_IDLE = 0,	   // Player idle						 
-  PS_PLAY,         // Start to player                                    
-  PS_PAUSE,        //Pause play                                         
-  PS_RECORDING,    //Recording states                                   
+  PS_IDLE = 0,	   // Player idle
+  PS_PLAY,         // Start to player
+  PS_PAUSE,        //Pause play
+  PS_RECORDING,    //Recording states
 } playingstatetype;
 
 /** Control states definations. */
 volatile typedef enum
 {
-  CS_EMPTY = 0,      // Have no control                                     
-  CS_PLAYPAUSE,      // Play/pause button pressed                     
-  CS_RECORDING,      // Play/pause button long pressed               
-  CS_UP,             // Up button pressed                                                          
-  CS_DOWN,           // Down button pressed                                                       
-  CS_NEXT,           // Right button pressed                                                      
-  CS_PREV,           // Left button pressed                                                       
+  CS_EMPTY = 0,      // Have no control
+  CS_PLAYPAUSE,      // Play/pause button pressed
+  CS_RECORDING,      // Play/pause button long pressed
+  CS_UP,             // Up button pressed
+  CS_DOWN,           // Down button pressed
+  CS_NEXT,           // Right button pressed
+  CS_PREV,           // Left button pressed
 } ctrlStatetype;
 
 typedef struct songDesc
@@ -96,25 +96,25 @@ private:
 class MusicPlayer
 {
 public:
-  
-  
+
+
   void begin(void);
   void play();
   void playSong(char songID);
-  void setVolume(int vol);
+  void setVolume(int Vol);
   void recording(char *recfile);
 
   //for Midi Player
   void beginMidi(void);
-  void midiDemoPlayer(void);		
- 
-  
+  void midiDemoPlayer(void);
+
+
 
 private:
   int Vol = 40;
   char songIndex;
   char MaxSong;
-  
+
   void initIO(void);
   void initSD(void);
   void initTimer1();

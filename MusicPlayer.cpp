@@ -79,10 +79,10 @@ ISR(TIMER1_OVF_vect)          //Timer1 Service
 	{
 		keys[i].scanKey();
 	}
-	
+
 	if (playingState == PS_PAUSE) digitalWrite(LED, HIGH);
 	else if (playingState == PS_IDLE) digitalWrite(LED,LOW);
-	else 
+	else
 	if (ledcount-- == 0)
 	{
 		digitalWrite(LED,!digitalRead(LED));
@@ -124,13 +124,13 @@ void MusicPlayer::initIO(void)
 {
   pinMode(SD_CS_PIN, OUTPUT);
   digitalWrite(SD_CS_PIN, HIGH);
-  
+
   pinMode(VS_XCS, OUTPUT);
   digitalWrite(VS_XCS, HIGH);
 
   pinMode(LED, OUTPUT);
   digitalWrite(LED,LOW);
-  	
+
   //keys input
   pinMode(KEY_VD, INPUT);
   pinMode(KEY_BK, INPUT);
@@ -156,7 +156,7 @@ void MusicPlayer::initSD(void)
 
   /* init sd card */
   if(!card.init(SPI_FULL_SPEED, SD_CS_PIN))   //SPI_FULL_SPEED
-  { 
+  {
     Serial.println("SD initialization failed.");
 	while(1);
   }
@@ -183,7 +183,7 @@ void MusicPlayer::initSD(void)
 			strncpy(list[i].name, name, 13);
 			list[i].index = index;
 			Serial.println(list[i++].name);
-		}	
+		}
     }
   }
   Serial.println();
@@ -193,16 +193,16 @@ void MusicPlayer::initSD(void)
 /**************************************************************/
 void MusicPlayer::begin(void)
 {
-	keys[0].setKey(KEY_PS,CS_PLAYPAUSE);
-  	keys[1].setKey(KEY_VD,CS_DOWN);
+  keys[0].setKey(KEY_PS,CS_PLAYPAUSE);
+  keys[1].setKey(KEY_VD,CS_DOWN);
 	keys[2].setKey(KEY_VU,CS_UP);
-  	keys[3].setKey(KEY_BK,CS_PREV);
-  	keys[4].setKey(KEY_NT,CS_NEXT);
-	
+  keys[3].setKey(KEY_BK,CS_PREV);
+  keys[4].setKey(KEY_NT,CS_NEXT);
+
   	initIO();
   	initSD();
   	VS1053.init();
-  	initTimer1();  // init timer1 
+  	initTimer1();  // init timer1
 }
 
 
@@ -250,9 +250,9 @@ void key::scanKey(void)
 		if(ctrlState == CS_RECORDING)
 		{
 			playingState = PS_RECORDING;
-			ctrlState = CS_EMPTY; 
+			ctrlState = CS_EMPTY;
 		}
-    }	
+    }
     break;
   default:
     break;
@@ -266,12 +266,12 @@ void MusicPlayer::play()
 
 	unsigned char bytes;        // How many bytes in buffer left
 	unsigned char n;
-	
+
 	SPI.setClockDivider(SPI_CLOCK_DIV2);
 	if(file.open(&root,list[songIndex].index,O_READ))
   	{
-		Serial.print("Playing ");	
-		Serial.println(list[songIndex].name);		
+		Serial.print("Playing ");
+		Serial.println(list[songIndex].name);
   	}
 	else
 	{
@@ -283,15 +283,15 @@ void MusicPlayer::play()
 
 	playingState = PS_PLAY;
 	while(bytes = file.read(fileBuf,sizeof(fileBuf)))
-	{      
+	{
         // actual audio data gets sent to VS10xx.
        	VS1053.writeData(fileBuf,bytes);
-        
+
 		switch (playingState)
-		{ 
+		{
 			case PS_PLAY:
 				switch(ctrlState)
-				{	
+				{
 					case CS_UP:
 						Vol += 10;
 						if (Vol > MaxVol)Vol = MaxVol;
@@ -317,7 +317,7 @@ void MusicPlayer::play()
 						ctrlState = CS_EMPTY;
 						return;
 					default:
-						break;	
+						break;
 				}
 				break;
 			case PS_PAUSE:
@@ -328,7 +328,7 @@ void MusicPlayer::play()
 				VS1053.softReset();
 			    return;
 		}
-				
+
 	}
 	file.close();
 	VS1053.softReset();
@@ -337,6 +337,13 @@ void MusicPlayer::play()
 
 }
 
+/****************************************************************/
+void MusicPlayer::setVolume(int Vol) {
+  if (Vol > MaxVol) Vol = MaxVol;
+  if (Vol < MinVol) Vol = MinVol;
+
+  VS1053.writeRegister(SPI_VOL, Vol*0x101);     //Set volume level
+}
 /**************************************************************/
 void MusicPlayer::playSong(char songID)
 {
@@ -347,8 +354,8 @@ void MusicPlayer::playSong(char songID)
 	SPI.setClockDivider(SPI_CLOCK_DIV2);
 	if(file.open(&root,list[songIndex].index,O_READ))
   	{
-		Serial.print("Playing ");	
-		Serial.println(list[songIndex].name);		
+		Serial.print("Playing ");
+		Serial.println(list[songIndex].name);
   	}
 	else
 	{
@@ -360,15 +367,15 @@ void MusicPlayer::playSong(char songID)
 
 	playingState = PS_PLAY;
 	while(bytes = file.read(fileBuf,sizeof(fileBuf)))
-	{      
+	{
         // actual audio data gets sent to VS10xx.
        	VS1053.writeData(fileBuf,bytes);
-        
+
 		switch (playingState)
-		{ 
+		{
 			case PS_PLAY:
 				switch(ctrlState)
-				{	
+				{
 					case CS_UP:
 						Vol += 10;
 						if (Vol > MaxVol)Vol = MaxVol;
@@ -394,7 +401,7 @@ void MusicPlayer::playSong(char songID)
 						ctrlState = CS_EMPTY;
 						return;
 					default:
-						break;	
+						break;
 				}
 				break;
 			case PS_PAUSE:
@@ -405,7 +412,7 @@ void MusicPlayer::playSong(char songID)
 				VS1053.softReset();
 			    return;
 		}
-				
+
 	}
 	file.close();
 	VS1053.softReset();
@@ -413,9 +420,6 @@ void MusicPlayer::playSong(char songID)
 	if (++songIndex > MaxSong)songIndex = 0;
 
 }
-
-
-
 
 /**************************************************************/
 void Set32(unsigned char *d, unsigned long n) {
@@ -439,22 +443,22 @@ void MusicPlayer::recording(char *recfile) {
     VS1053.writeRegister(SPI_AICTRL3,7);       //PCM Mode ,left channel
 	//VS1053.writeRegister(SPI_AICTRL3,6);     //PCM Mode ,right channel,board mic
     VS1053.writeRegister(SPI_CLOCKF,0x2000);   //set clock
-    
+
     VS1053.writeRegister(SPI_MODE,0x1804);   //mic,Initialize recording
     delay(2);
-    
+
     VS1053.loadPlugin(recPlugin,sizeof(recPlugin)/sizeof(recPlugin[0]));
 
 	SPI.setClockDivider(SPI_CLOCK_DIV2);
 	file.remove(&root,recfile);
-    
+
 	if(file.open(&root,recfile,O_WRITE|O_CREAT) == NULL)
   	{
 		Serial.println("Rec open fail");
 		return;
   	}
 	playingState == PS_RECORDING;
-	Serial.println("Recording ...");	
+	Serial.println("Recording ...");
 	SPI.setClockDivider(SPI_CLOCK_DIV16);
 	while(playingState != PS_PAUSE)
 	{
@@ -462,10 +466,10 @@ void MusicPlayer::recording(char *recfile) {
 
 		if ((n = VS1053.readRegister(SPI_HDAT1)) > 0)
 		{
-                //Make little-endian conversion for 16-bit PCM .WAV files 
+                //Make little-endian conversion for 16-bit PCM .WAV files
 			   if(n>16)n=16;
                for (char i=0; i<n;i++) {
-				   
+
                    unsigned int w = VS1053.readRegister(SPI_HDAT0);
 				    *rbp++ = (unsigned char)(w & 0xFF);
                     *rbp++ = (unsigned char)(w >> 8);
@@ -482,7 +486,7 @@ void MusicPlayer::recording(char *recfile) {
         Set32(pcmHeader+40, fileSize-36);
         file.write(pcmHeader, sizeof(pcmHeader));
         file.close();
-		
+
 		Serial.print("recording end\r\n");
         /* Finally, reset the VS10xx software, including realoading the
              patches package, to make sure everything is set up properly. */
@@ -565,5 +569,3 @@ void MusicPlayer::midiDemoPlayer(void)
     delay(100);
     }
 }
-
-
